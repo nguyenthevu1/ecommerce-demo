@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+    mymongodb:
+        image: mongo
+        restart: unless-stopped
+        ports:
+            - '27018:27017'
+        volumes:
+            - ./db:/data/db
+    
+    frontend:
+        build:
+            dockerfile: Dockerfile
+            context: ./frontend
+        image: frontend
+        restart: unless-stopped
+        ports:
+            - '3000:3000'
+        volumes:
+            - ./FrontEnd:/usr/src/app
+        links:
+            - server
+        depends_on:
+            - server
+
+    admin:
+        build:
+            dockerfile: Dockerfile
+            context: ./admin
+        image: admin
+        restart: unless-stopped
+        ports:
+            - '3001:3001'
+        links:
+            - server
+        depends_on:
+            - server
+
+    server:
+        build:
+            dockerfile: Dockerfile
+            context: ./backend
+        image: server
+        env_file: docker-compose.env
+        restart: unless-stopped
+        ports:
+            - '5000:5000'
+        links:
+            - mymongodb
+        depends_on:
+            - mymongodb
+
+volumes:
+    data:
