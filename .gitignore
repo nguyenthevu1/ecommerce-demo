@@ -4,7 +4,8 @@
 **/*/node_modules
 **/*/.pnp
 **/*/.pnp.js
-/db
+/mongo-db
+/storage-minio
 # testing
 /coverage
 
@@ -13,7 +14,8 @@
 
 # misc
 *.DS_Store
-*.env.local
+**/*.env
+**/*.env.local
 *.env.development.local
 *.env.test.local
 *.env.production.local

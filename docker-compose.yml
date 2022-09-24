@@ -7,8 +7,24 @@ services:
         ports:
             - '27018:27017'
         volumes:
-            - ./db:/data/db
-    
+            - ./mongo-db:/data/db
+        networks:
+            - my-network
+    s3:
+        image: minio/minio
+        restart: unless-stopped
+        environment:
+            MINIO_ROOT_USER: minioadmin
+            MINIO_ROOT_PASSWORD: minioadmin
+        ports:
+            - '9000:9000'
+            - '9099:9099'
+        volumes:
+            - ./storage-minio:/data
+        command: server --address ":9099" --console-address ":9000" /data
+        networks:
+            - my-network
+        
     frontend:
         build:
             dockerfile: Dockerfile
@@ -19,10 +35,11 @@ services:
             - '3000:3000'
         volumes:
             - ./FrontEnd:/usr/src/app
-        links:
-            - server
         depends_on:
             - server
+        networks:
+            - my-network
+
 
     admin:
         build:
@@ -32,10 +49,10 @@ services:
         restart: unless-stopped
         ports:
             - '3001:3001'
-        links:
-            - server
         depends_on:
             - server
+        networks:
+            - my-network    
 
     server:
         build:
@@ -46,10 +63,18 @@ services:
         restart: unless-stopped
         ports:
             - '5000:5000'
-        links:
-            - mymongodb
         depends_on:
             - mymongodb
+            - s3
+        networks:
+            - my-network
+
+networks:
+    my-network:
+        driver: bridge
 
 volumes:
-    data:
+    mongo-db:
+        driver: local
+    storage-minio:
+        driver: local

@@ -4,7 +4,7 @@ import User from '../models/user.model.js';
 
 const protectRouter = asyncHandler(async (req, res, next) => {
     let token;
-
+    
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         try {
             token = req.headers.authorization.split(' ')[1];
@@ -18,15 +18,15 @@ const protectRouter = asyncHandler(async (req, res, next) => {
             throw new Error('Not Authorized');
         }
 
-        if (!token) {
-            res.status(401);
-            throw new Error('Not Authorized');
-        }
+    }
+    if (!token) {
+        res.status(401);
+        throw new Error('Not Authorized');
     }
 });
 
 export const checkRole = asyncHandler(async (req, res, next) => {
-    if (!req.user.isAdmin) {
+    if (!req.user?.isAdmin) {
         res.status(403);
         throw new Error('Not Access');
     }
